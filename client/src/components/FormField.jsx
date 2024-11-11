@@ -1,7 +1,5 @@
-import PropTypes from "prop-types";
-
 const FormField = ({
-  labelName = '',
+  labelName,
   type,
   name,
   placeholder,
@@ -32,26 +30,16 @@ const FormField = ({
       <input
         type={type}
         id={name}
+        name={name}
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+         rounded-lg focus:ring-[#4648ff] focus:border-[#4648ff] outline-none block w-full p-3"
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
         required
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
-         rounded-lg focus:ring-[#4648ff] focus:border-[#4648ff] outline-none block w-full p-3"
       />
     </div>
   );
-};
-
-FormField.propTypes = {
-  labelName: PropTypes.string,
-  type: PropTypes.string,
-  name: PropTypes.string,
-  placeholder: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // 문자열 또는 숫자 허용
-  handleChange: PropTypes.func.isRequired,
-  isSurpriseMe: PropTypes.bool,
-  handleSurpriseMe: PropTypes.func,
 };
 
 export default FormField;
