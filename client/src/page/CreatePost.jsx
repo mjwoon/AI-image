@@ -1,20 +1,21 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { preview } from "../assets";
+import { FormField, Loader, FormFieldDiary } from "../components";
 
-import { preview } from '../assets';
-import { getRandomPrompt } from '../utils';
-import { FormField, Loader } from '../components';
+/**
+ * @typedef {Object} FormData
+ * @property {string} name - The user's name
+ * @property {string} prompt - The prompt text
+ * @property {string} photo - The photo URL
+ */
 
 const CreatePost = () => {
   const navigate = useNavigate();
 
   /**
-   * @param {Object} form - The current form state.
-   * @param {string} form.name - The user's name.
-   * @param {string} form.prompt - The prompt text.
-   * @param {string} form.photo - The photo URL.
+   * @type {[FormData, React.Dispatch<React.SetStateAction<FormData>>]}
    */
-
   const [form, setForm] = useState({
     name: "",
     prompt: "",
@@ -24,36 +25,32 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSurpriseMe = () => {
-    const randomPrompt = getRandomPrompt(form.prompt);
-    setForm({ ...form, prompt: randomPrompt });
   };
 
   const generateImage = async () => {
-    const aiPrompt = form.prompt;
-    if (form.prompt) {
+    const aiPrompt = form.prompt.trim();
+    if (aiPrompt) {
       try {
+        console.log("Sending prompt:", aiPrompt); // 요청 데이터 디버깅
         setGeneratingImg(true);
-        const response = await fetch(
-          "http://localhost:8080/api/v1/dalle",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              prompt: aiPrompt,
-            }),
-          }
-        );
+        const response = await fetch("http://localhost:8080/api/v1/dalle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: aiPrompt,
+          }),
+        });
 
         const data = await response.json();
+        console.log("Response data:", data); // 서버 응답 디버깅
         setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}` });
       } catch (err) {
-        alert(err);
+        console.error(err);
+        alert(err.message || "An error occurred.");
       } finally {
         setGeneratingImg(false);
       }
@@ -68,16 +65,13 @@ const CreatePost = () => {
     if (form.prompt && form.photo) {
       setLoading(true);
       try {
-        const response = await fetch(
-          "http://localhost:8080/api/v1/post",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ ...form }),
-          }
-        );
+        const response = await fetch("http://localhost:8080/api/v1/post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...form }),
+        });
 
         await response.json();
         alert("Success");
@@ -95,36 +89,38 @@ const CreatePost = () => {
   return (
     <section className="max-w-7xl mx-auto">
       <div>
-        <h1 className="font-extrabold text-[#222328] text-[32px]">Create</h1>
-        <p className="mt-2 text-[#666e75] text-[14px] max-w-[500px]">
-          Generate an imaginative image through DALL-E AI and share it with the
-          community
+        <h1 className="font-extrabold text-[#222328] text-[32px]">
+          Write Diary
+        </h1>
+        <p className="mt-2 text-[#666e75] text-[14px]">
+          DALL-E AI로 나의 아바타에게 감정을 기록해주고, 그에 맞는 오늘의 이미지를 생성해보세요!
         </p>
       </div>
 
-      <form className="mt-16 max-w-3xl" onSubmit={handleSubmit}>
+      <form className="mt-8 max-w-3xl" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-5">
           <FormField
-            labelName="Your Name"
+            labelName="Today's Date"
             type="text"
             name="name"
-            placeholder="Ex., john doe"
+            placeholder="오늘의 날짜를 적어주세요 (Ex: 2024/07/07)"
             value={form.name}
             handleChange={handleChange}
           />
 
-          <FormField
-            labelName="Prompt"
+          <FormFieldDiary
+            labelName="Today's Diary"
             type="text"
             name="prompt"
-            placeholder="An Impressionist oil painting of sunflowers in a purple vase…"
+            placeholder="오늘은 아침 9시에 눈이떠졌다. 아침 일찍 집을 나섰는데 날씨가 너무 맑아서 기분이 좋았다 !
+12시에 수업끝나구 마라탕을 먹으러갔는데, 마라탕에서 벌레가 나와 깜짝!@!!놀랬다.
+원래 기분 좋았는데.. 마라탕 속 벌레때문에 기분이 안좋아졌다.
+그래도 꿔바로우가 맛있어서 기분 풀기로했다 !"
             value={form.prompt}
             handleChange={handleChange}
-            isSurpriseMe
-            handleSurpriseMe={handleSurpriseMe}
           />
 
-          <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64 p-3 h-64 flex justify-center items-center">
+          <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-72 p-3 h-72 flex justify-center items-center">
             {form.photo ? (
               <img
                 src={form.photo}
@@ -151,7 +147,7 @@ const CreatePost = () => {
           <button
             type="button"
             onClick={generateImage}
-            className=" text-white bg-green-700 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+            className=" text-white bg-[#969696] hover:bg-[#E95C42] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
             {generatingImg ? "Generating..." : "Generate"}
           </button>
@@ -159,14 +155,14 @@ const CreatePost = () => {
 
         <div className="mt-10">
           <p className="mt-2 text-[#666e75] text-[14px]">
-            ** Once you have created the image you want, you can share it with
-            others in the community **
+            ** 원하는 이미지가 생성되었다면, 다이어리에 오늘의 이미지를
+            저장해주세요! **
           </p>
           <button
             type="submit"
-            className="mt-3 text-white bg-[#6469ff] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+            className="mt-3 text-white bg-[#C5D887] hover:bg-[#FFD66C] font-semibold rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
-            {loading ? "Sharing..." : "Share with the Community"}
+            {loading ? "Saving..." : "Save to Diary"}
           </button>
         </div>
       </form>

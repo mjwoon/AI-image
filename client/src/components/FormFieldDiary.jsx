@@ -1,4 +1,4 @@
-const FormField = ({
+const FormFieldDiary = ({
   labelName,
   type,
   name,
@@ -27,12 +27,12 @@ const FormField = ({
           </button>
         )}
       </div>
-      <input
+      <textarea
         type={type}
         id={name}
         name={name}
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
-         rounded-lg focus:ring-[#C5D887] focus:border-[#C5D887] outline-none block w-full p-3"
+         rounded-lg focus:ring-[#C5D887] focus:border-[#C5D887] outline-none block w-full h-32 p-3 resize-none"
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
@@ -42,4 +42,4 @@ const FormField = ({
   );
 };
 
-export default FormField;
+export default FormFieldDiary;

@@ -1,8 +1,6 @@
 import express from "express";
 import * as dotenv from "dotenv";
 import OpenAI from "openai";
-import axios from "axios";
-import fs from "fs";
 
 const app = express();
 app.use(express.json());
@@ -23,9 +21,36 @@ router.route("/").post(async (req, res) => {
   try {
     const { prompt } = req.body;
 
+    const emotionResponse = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an assistant that extracts emotions from text. Respond with one word that best describes the emotion.",
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Extract the emotion from this text: "${prompt}"`,
+            },
+          ],
+          temperature: 0.7,
+          max_tokens: 60,
+          top_p: 1.0,
+          frequency_penalty: 0.0,
+          presence_penalty: 0.0,
+        },
+      ],
+    });
+    const emotion = emotionResponse.choices[0].message.content;
+    const enhancedPrompt = `a bischon frise, pixel, with a ${emotion} atmosphere`;
+
     const aiResponse = await openai.images.generate({
       model: "dall-e-3",
-      prompt,
+      prompt: enhancedPrompt,
       n: 1,
       size: "1024x1024",
       response_format: "b64_json",
