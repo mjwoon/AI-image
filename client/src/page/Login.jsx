@@ -39,6 +39,7 @@ const Login = ({ setIsLoggedIn, setUserInfo }) => {
               이메일
             </label>
             <input
+              autocomplete="off"
               type="email"
               id="email"
               value={email}
@@ -56,6 +57,7 @@ const Login = ({ setIsLoggedIn, setUserInfo }) => {
               비밀번호
             </label>
             <input
+              autocomplete="off"
               type="password"
               id="password"
               value={password}

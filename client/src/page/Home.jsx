@@ -63,11 +63,13 @@ const Home = ({ userInfo, setIsLoggedIn }) => {
 
     setSearchTimeout(
       setTimeout(() => {
-        const searchResult = allPosts.filter(
-          (item) =>
-            item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-            item.prompt.toLowerCase().includes(searchText.toLowerCase())
-        );
+        const searchResult = allPosts
+          .filter(
+            (item) =>
+              item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+              item.prompt.toLowerCase().includes(searchText.toLowerCase())
+          )
+          .sort((a, b) => a.name.localeCompare(b.name));
         setSearchedResults(searchResult);
       }, 500)
     );

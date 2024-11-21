@@ -67,6 +67,7 @@ const Signup = () => {
               닉네임
             </label>
             <input
+              autocomplete="off"
               type="text"
               id="nickname"
               value={nickname}
@@ -84,6 +85,7 @@ const Signup = () => {
               이메일
             </label>
             <input
+              autocomplete="off"
               type="email"
               id="email"
               value={email}
